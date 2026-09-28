@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeatherMate - Smart Weather Assistant</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+<header class="header">
+  <div class="logo"><i class="fa-solid fa-cloud-sun"></i> WeatherMate</div>
+  <div class="location"><i class="fa-solid fa-location-dot"></i> <span id="locationName">Search a location</span></div>
+  <button class="refresh-btn" onclick="searchLocation()" title="Search location"><i class="fa-solid fa-magnifying-glass"></i></button>
+</header>
+
+
+<div class="location-search">
+  <div class="search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input id="locationSearch" type="text"
+           placeholder="Search city or location..."
+           onkeydown="handleLocationEnter(event)"
+           autocomplete="off">
+    <button onclick="searchLocation()">Search</button>
+  </div>
+  <div class="live-controls">
+      <span id="searchStatus" class="search-status">Search a city to view its live weather.</span>
+      <label class="live-toggle">
+        <input type="checkbox" id="liveToggle" checked>
+        <span class="green-live-dot"> Live</span>
+      </label>
+    </div>
+</div>
+
+<div id="loading" class="loading hidden"><i class="fa-solid fa-spinner fa-spin"></i> Getting current weather...</div>
+
+<main id="app" class="container hidden">
+  <section class="hero-card">
+    <div>
+      <p id="todayDate">Today</p>
+      <h1><span id="temperature">--</span>°C</h1>
+      <h2 id="weatherDescription">Current weather</h2>
+      <p>Feels like <strong><span id="feelsLike">--</span>°C</strong></p>
+    </div>
+    <div class="weather-icon">☀️</div>
+  </section>
+
+  <section class="stats-grid">
+    <div class="stat-card"><i class="fa-solid fa-droplet"></i><p>Humidity</p><h3 id="humidity">--%</h3></div>
+    <div class="stat-card"><i class="fa-solid fa-wind"></i><p>Wind</p><h3 id="wind">-- km/h</h3></div>
+    <div class="stat-card"><i class="fa-solid fa-sun"></i><p>UV Index</p><h3 id="uv">--</h3></div>
+    <div class="stat-card"><i class="fa-solid fa-cloud-rain"></i><p>Rain Chance</p><h3 id="rainChance">--%</h3></div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-title"><h2><i class="fa-solid fa-lightbulb"></i> Today's Advice</h2></div>
+    <div class="advice-grid">
+      <div class="advice-item"><span>☔</span><p id="rainAdvice">Checking rain...</p></div>
+      <div class="advice-item"><span>👕</span><p id="outfitAdvice">Checking outfit...</p></div>
+      <div class="advice-item"><span>🏃</span><p id="activityAdvice">Checking activities...</p></div>
+    </div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-title"><h2><i class="fa-solid fa-clock"></i> Live Hourly Timeline</h2></div>
+    <div id="hourlyForecast" class="hourly-container"></div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-title"><h2><i class="fa-solid fa-shirt"></i> Live Smart Outfit Suggestion</h2></div>
+    <div class="outfit-box">
+      <div class="outfit-emoji">👕</div>
+      <div><h2 id="outfitTitle">Smart Outfit</h2><p id="outfitDetails">Loading recommendation...</p></div>
+    </div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-title"><h2><i class="fa-solid fa-person-running"></i> Live Daily Activity Advisor</h2></div>
+    <div class="activity-box">
+      <div class="activity-score"><span id="activityEmoji">😊</span><h2 id="activityStatus">Good</h2></div>
+      <p id="activityText">Weather is suitable for outdoor activities.</p>
+      <div class="activity-list">
+        <div>🚶 Walking <span>✓</span></div>
+        <div>🚴 Cycling <span>✓</span></div>
+        <div>🏸 Badminton <span>✓</span></div>
+        <div>📚 Study Outside <span>✓</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-title"><h2><i class="fa-solid fa-leaf"></i> Live Air Quality & UV</h2></div>
+    <div class="quality-grid">
+      <div class="quality-card"><h3>Air Quality</h3><div class="big-number" id="aqi">--</div><p id="aqiStatus">Loading...</p></div>
+      <div class="quality-card"><h3>UV Index</h3><div class="big-number" id="uvLarge">--</div><p id="uvStatus">Loading...</p></div>
+    </div>
+  </section>
+<section class="section-card">
+    <div class="section-title"><h2><i class="fa-solid fa-map"></i> Live Weather Map</h2></div>
+    <div class="map-box">
+      <iframe id="weatherMap" title="Live Weather Map" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade" src="about:blank"></iframe>
+      <p class="map-note">📍 Map follows the searched location.</p>
+    </div>
+  </section>
+
+  <section class="section-card alert-card">
+    <div class="section-title"><h2><i class="fa-solid fa-triangle-exclamation"></i> Weather Alerts</h2></div>
+    <div id="weatherAlert"><h2>✓ No major alerts</h2><p>Weather conditions are currently normal.</p></div>
+  </section>
+
+  <section class="section-card">
+    <div class="section-title"><h2><i class="fa-solid fa-chart-column"></i> Live Live Weather Comparison</h2></div>
+    <div class="comparison">
+      <div class="comparison-item"><h3>Today</h3><div class="compare-icon">☀️</div><strong><span id="todayTemp">--</span>°C</strong></div>
+      <div class="comparison-vs">VS</div>
+      <div class="comparison-item"><h3>Yesterday</h3><div class="compare-icon">🌤️</div><strong><span id="yesterdayTemp">--</span>°C</strong></div>
+    </div>
+    <div class="difference">Difference: <strong id="temperatureDifference">--</strong></div>
+  </section>
+
+</main>
+
+<footer><p>🌦️ WeatherMate<br>Smart Weather • Smart Decisions</p></footer>
+<script src="script.js?v=7"></script>
+<footer class="weather-footer">
+  <p>© 2026 WeatherMate. All rights reserved.</p>
+  <p>Live weather information powered by weather data services.</p>
+</footer>
+</body>
+</html>
